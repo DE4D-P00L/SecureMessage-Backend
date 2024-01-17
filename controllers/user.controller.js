@@ -11,6 +11,10 @@ export const signUp = async (req,res)=>{
     }
 
     try {
+        const findUser = await User.findOne({email:email})
+
+        if(!!findUser) return res.status(409).json({message:"Email already exists"});
+
         //password hashing is handled in User Model i.e. ../models/user.model.js
         const user = await User.create({ name, email, password });
         const safeResponse = {
