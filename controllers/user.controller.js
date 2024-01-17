@@ -13,16 +13,19 @@ export const signUp = async (req,res)=>{
     try {
         const findUser = await User.findOne({email:email})
 
-        if(!!findUser) return res.status(409).json({message:"Email already exists"});
+        if(findUser){
 
-        //password hashing is handled in User Model i.e. ../models/user.model.js
-        const user = await User.create({ name, email, password });
-        const safeResponse = {
-            _id: user._id,
-            name: user.name,
-            email: user.email,
+            //password hashing is handled in User Model i.e. ../models/user.model.js
+            const user = await User.create({ name, email, password });
+            const safeResponse = {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+            }
+            return res.status(201).json({message:"User created", user:safeResponse})
         }
-        res.status(201).json({message:"User created", user:safeResponse})
+        
+        res.status(409).json({message:"Email already exists"});
     } catch (e) {
         console.log(e.message);
     }
