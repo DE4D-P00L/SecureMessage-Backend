@@ -11,12 +11,17 @@ export const sendMessage = async (req,res)=>{
     }
 
     try{
-        const msg = await Chat.create({message,sentBy})
-        
-        //Update chatId in User document
-        const chatId={chatId:msg._id}
-        const updateUser = await User.findByIdAndUpdate({_id:sentBy},chatId,{new:true});
+        const user = await User.findById(sentBy);
+        const cid = user.chatId;
 
+        if(!cid){
+            const msg = await Chat.create({message,sentBy})
+            const chatId={chatId:msg._id}
+            const updateUser = await User.findByIdAndUpdate({_id:sentBy},chatId,{new:true});
+        }
+        else{
+            const msg = await Chat.findByIdAndUpdate({_id:cid},message,{new:true});
+        }
         res.status(200).json({message:msg});
     }catch(e){
         console.log(e.message);

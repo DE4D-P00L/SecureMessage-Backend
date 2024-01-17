@@ -15,14 +15,14 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 //Allow frontend requests
-// app.use(cors({
-//     origin: 'https://secret-share-btri.onrender.com/',
-//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//     credentials: true,
-//     allowedHeaders: ['Content-Type', 'Authorization']
-// }));
+app.use(cors({
+    origin: 'https://secret-share-btri.onrender.com/',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-app.use(cors())
+// app.use(cors())
 
 //Middlewares
 app.use(express.urlencoded({ extended:false }));
