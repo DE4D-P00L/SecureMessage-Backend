@@ -12,13 +12,13 @@ export const sendMessage = async (req,res)=>{
 
     try{
         const user = await User.findById(sentBy);
-        const cid = user.chatId;
+        const cid = user?.chatId?.toString();
 
         //First time message
         if(!cid){
             const msg = await Chat.create({message,sentBy})
             const chatId={chatId:msg._id}
-            const updateUser = await User.findByIdAndUpdate({_id:sentBy},{chatId},{new:true});
+            const updateUser = await User.findByIdAndUpdate({_id:sentBy},chatId,{new:true});
             res.status(200).json({message:msg});
         }
         else{
