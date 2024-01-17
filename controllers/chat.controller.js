@@ -14,15 +14,18 @@ export const sendMessage = async (req,res)=>{
         const user = await User.findById(sentBy);
         const cid = user.chatId;
 
+        //First time message
         if(!cid){
             const msg = await Chat.create({message,sentBy})
             const chatId={chatId:msg._id}
-            const updateUser = await User.findByIdAndUpdate({_id:sentBy},chatId,{new:true});
+            const updateUser = await User.findByIdAndUpdate({_id:sentBy},{chatId},{new:true});
+            res.status(200).json({message:msg});
         }
         else{
-            const msg = await Chat.findByIdAndUpdate({_id:cid},message,{new:true});
+            //Update previous message to replace previous
+            const msg = await Chat.findByIdAndUpdate({_id:cid},{message},{new:true});
+            res.status(200).json({updated:msg});
         }
-        res.status(200).json({message:msg});
     }catch(e){
         console.log(e.message);
     }
@@ -37,5 +40,3 @@ export const getMessages = async (req,res)=>{
         console.log(e.message);
     }
 }
-
-//TODO: Update message
