@@ -31,7 +31,7 @@ export const sendMessage = async (req,res)=>{
 //Get all messages
 export const getMessages = async (req,res)=>{
     try{
-        const messages = await Chat.find({});
+        const messages = await Chat.find({}).sort({ createdAt: -1 });
         res.status(200).json({ messages });
     }catch(e){
         console.log(e.message);
