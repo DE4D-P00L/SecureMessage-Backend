@@ -34,6 +34,8 @@ export const logIn = async (req,res)=>{
     try {
         const user = await User.findOne({ email: email })
 
+        if(!user) return res.status(401).json({message:"Wrong Email"}) 
+
         //Verify Input Password and Hashed Password
         const verify = await bcrypt.compare(password,user.password);
         if(!verify)
