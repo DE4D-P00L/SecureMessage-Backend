@@ -1,6 +1,8 @@
 import User from '../models/user.model.js'
 import { generateToken } from '../middlewares/Jwt.js'
 import bcrypt from 'bcrypt';
+import { sendEmail } from '../util/sendEmail.js';
+import crypto from 'crypto';
 
 export const signUp = async (req,res)=>{
     const { name, email, password } = req.body;
@@ -63,4 +65,44 @@ export const logIn = async (req,res)=>{
     }
 }
 
+export const forgotPassword = async (req, res) => {
+    const {email} = req.body;
+    
+    try {
+        const user = await User.findOne({email: email});
+        if(!user) return res.status(404).json({message: "User not found"})
+
+        const resetToken = await user.getResetToken();
+        await user.save();
+        const url = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+        const message = `Click on the link to reset password. ${url} If you have not requested then please ignore.`
+        sendEmail(user.email,"Reset Password",message)
+
+        res.status(200).json({message: resetToken})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+export const resetPassword = async (req, res) =>{
+    const {token} = req.params
+    try {
+        const resetPasswordToken = crypto.createHash("sha256").update(token).digest('hex');
+
+        const user = await User.findOne({resetPasswordToken});
+
+
+        if(!user || user.resetPasswordExpire < Date.now()) return res.status(400).json({message:"Token is invalid or expired",token:resetPasswordToken, result:user.resetPasswordExpire > Date.now()})
+
+        //reset password
+        user.password = req.body.password
+        user.resetPasswordExpire = undefined;
+        user.resetPasswordToken= undefined;
+        user.save();
+
+        res.status(200).json({message: "Password Changed"})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
