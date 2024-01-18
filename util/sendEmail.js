@@ -11,6 +11,6 @@ export const sendEmail = async (to,subject,text) =>{
       });
 
     await transporter.sendMail({
-        to,subject,text
+        to,subject,text,from:"prashant200025@gmail.com"
     })
 }
